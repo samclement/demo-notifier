@@ -1,5 +1,11 @@
 # demo-notifier
 
+> **A demo app of the swhurl platform.** With [demo-shop](https://github.com/samclement/demo-shop), [demo-orders](https://github.com/samclement/demo-orders) and [demo-shopper](https://github.com/samclement/demo-shopper) it shows how apps on the platform work together. This one shows:
+>
+> - **Receiving another app's event.** `swhurl.yaml` says `events: {subscribe: [demo-orders.created]}`; `Worker.kt` handles each order demo-orders publishes, without knowing where demo-orders runs. An event missed while this app was down arrives when it is back.
+> - **Telling the team.** An order of ten or more becomes a message on the notification channel of the team that owns this app (`platform.notify`). The steady demo traffic buys one to three, so it never notifies; buy twelve of something in demo-shop to see one.
+> - **The second stack.** Kotlin on Micronaut, a worker with no web address; the other demo apps are TypeScript.
+
 Demo: receives demo-orders.created and tells the team about big orders
 
 A Kotlin ([Micronaut](https://micronaut.io/)) app on the [swhurl platform](https://github.com/samclement/swhurl-platform), made from the [swhurl Kotlin template](https://github.com/samclement/swhurl-app-template-kotlin). Every push to `main` is checked, published to `ghcr.io/<owner>/demo-notifier` and deployed to staging; production changes through **Promote to production**. What the image must provide, the checks and the dependency updates: the [template's guide](https://github.com/samclement/swhurl-app-template-kotlin#readme). What the app needs from the platform: [`swhurl.yaml`](swhurl.yaml).

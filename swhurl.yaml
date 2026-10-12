@@ -11,3 +11,6 @@ resources:
   cpu: 100m
   memory: 192Mi
   memoryLimit: 384Mi
+# The events this app receives: <app>.<event>. The platform gives it permission for exactly these.
+events:
+  subscribe: [demo-orders.created]
