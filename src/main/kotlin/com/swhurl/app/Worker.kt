@@ -1,0 +1,38 @@
+package com.swhurl.app
+
+import io.micronaut.context.annotation.Value
+import io.micronaut.scheduling.annotation.Scheduled
+import jakarta.annotation.PostConstruct
+import jakarta.inject.Singleton
+import java.util.concurrent.atomic.AtomicLong
+import org.slf4j.LoggerFactory
+
+// A background worker: one unit of work every WORK_INTERVAL_MS (default a minute), the first at start.
+// Replace work() with the app's job. The platform restarts the pod if the process exits.
+@Singleton
+class Worker(
+    @Value("\${otel.service.name:swhurl-app}") private val serviceName: String,
+    private val events: Events,
+) {
+    private val log = LoggerFactory.getLogger(Worker::class.java)
+    val runs = AtomicLong()
+
+    // An example of receiving: log every event this app declared it subscribes to (events.subscribe in
+    // swhurl.yaml). Each is handled inside the publisher's trace; throw to receive it again.
+    @PostConstruct
+    fun listen() {
+        for (name in events.declaredSubscriptions()) {
+            events.subscribe(name) { event -> log.info("event received: ${event.type} ${event.id} from ${event.source}") }
+        }
+    }
+
+    @Scheduled(initialDelay = "0s", fixedDelay = "\${work.interval.ms:60000}ms")
+    fun work() {
+        try {
+            runs.incrementAndGet()
+            log.info("work done")
+        } catch (error: Exception) {
+            log.error("work failed", error)
+        }
+    }
+}
