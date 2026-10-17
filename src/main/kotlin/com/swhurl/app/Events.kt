@@ -33,8 +33,9 @@ import tools.jackson.dataformat.yaml.YAMLMapper
 // Events between apps on the swhurl platform's NATS JetStream.
 // https://github.com/samclement/swhurl-platform/blob/main/docs/apps.md#events
 //
-// Declare them in swhurl.yaml (events: {publish: [created], subscribe: [orders.created]}); the
-// platform then gives this app an address, a key and permission for exactly those events:
+// What it publishes is declared in swhurl.yaml (events: {publish: [created]}) or asyncapi.yaml; what it
+// receives is granted on the platform (Connect to an app, or make app-events). The platform then gives
+// this app an address, a key and permission for exactly those events:
 //
 //   events.publish("created", mapOf("id" to 42))            // other apps see <this app>.created
 //   events.subscribe("orders.created") { event -> ... }     // throw to get it again
@@ -142,6 +143,9 @@ class Events(private val platform: Platform, private val json: JsonMapper) {
             throw EventInvalid("\"$event\" does not fit its schema in asyncapi.yaml: ${problems.joinToString("; ") { it.message }}")
         }
     }
+
+    /** The app's NATS connection, opened on first use: events and feature flag overrides (FlagWatcher) share it. */
+    fun connection(): Connection = connected()
 
     @Synchronized
     private fun connected(): Connection {
