@@ -47,8 +47,12 @@ class Worker(
     @Scheduled(initialDelay = "0s", fixedDelay = "\${work.interval.ms:60000}ms")
     fun work() {
         try {
+            // An example of publishing: "worked" is described in asyncapi.yaml, which is what lets other
+            // apps find it and subscribe. Off the platform the payload is still checked, and nothing is sent.
+            events.publish("worked", mapOf("at" to java.time.Instant.now().toString()))
             runs.incrementAndGet()
-            log.info("work done")
+            // An example of a feature flag: shout is declared in swhurl.yaml, on in staging only.
+            log.info(if (Flags.shout) "WORK DONE" else "work done")
         } catch (error: Exception) {
             log.error("work failed", error)
         }
