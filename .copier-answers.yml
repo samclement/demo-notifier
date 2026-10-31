@@ -1,5 +1,5 @@
 # Written by Copier from samclement/swhurl-app-template-kotlin; `copier update` reads it. Do not edit.
-_commit: v0.2.21
+_commit: v0.2.22
 _src_path: https://github.com/samclement/swhurl-app-template-kotlin.git
 api: none
 app_name: demo-notifier
